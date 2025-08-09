@@ -1,4 +1,4 @@
-// main.js
+// main.js (patched)
 import { $, $$ } from './utils.js';
 import { loadInv, saveInv, wipeInv } from './storage.js';
 import { renderInv, addInv, delInv, useInv } from './inventory.js';
@@ -7,8 +7,14 @@ import { genRecipeRule } from './recipe_rule.js';
 import { renderRecipeCard, setShopping } from './ui.js';
 import { genRecipeAI } from './ai.js';
 
+// Firebase & Sync (new)
+import { initFirebase, signInWithGoogle, signOutUser, onAuthChanged } from './firebase.js';
+import { initSync } from './sync.js';
+
 // ======= init =======
 renderInv();
+initFirebase();
+initSync();
 
 // ======= form handlers =======
 $('#addForm').addEventListener('submit', (e)=>{
@@ -79,3 +85,23 @@ document.querySelector('#copyShop').onclick=()=>{
   });
 };
 document.querySelector('#clearShop').onclick=()=>{ document.querySelector('#shopping').innerHTML=''; };
+
+// ======= Auth buttons (new) =======
+const btnIn = document.getElementById('signinGoogle');
+const btnOut = document.getElementById('signout');
+const cloudStatus = document.getElementById('cloudStatus');
+
+if (btnIn) btnIn.onclick = () => signInWithGoogle();
+if (btnOut) btnOut.onclick = () => signOutUser();
+
+onAuthChanged((user)=>{
+  if (user){
+    if (btnIn) btnIn.style.display = 'none';
+    if (btnOut) btnOut.style.display = 'inline-flex';
+    if (cloudStatus) cloudStatus.textContent = `同期中: ${user.displayName||user.email||user.uid}`;
+  }else{
+    if (btnIn) btnIn.style.display = 'inline-flex';
+    if (btnOut) btnOut.style.display = 'none';
+    if (cloudStatus) cloudStatus.textContent = '未ログイン（ローカルのみ）';
+  }
+});

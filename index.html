@@ -5,18 +5,24 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>食材リミット</title>
   <link rel="stylesheet" href="./assets/styles.css" />
-  <!-- OCR & LLM (global) -->
+  <!-- OCR -->
   <script src="https://cdn.jsdelivr.net/npm/tesseract.js@4/dist/tesseract.min.js"></script>
 </head>
 <body>
   <header class="header">
     <div class="wrap">
       <h1>🍳 食材リミット <span class="badge">MVP+</span></h1>
+      <!-- 追加: 認証 / ステータス -->
+      <div class="stack" style="margin-top:8px">
+        <button class="btn ghost" id="signinGoogle">Googleでログイン</button>
+        <button class="btn ghost" id="signout" style="display:none">ログアウト</button>
+        <span id="cloudStatus" class="muted"></span>
+      </div>
     </div>
   </header>
 
+  <!-- 以降のDOMは既存のrefactor版と同じ前提です（変更なし） -->
   <main class="wrap grid">
-    <!-- 左：在庫 + スキャン -->
     <section class="card">
       <h2>在庫 & 追加</h2>
       <div class="section">
@@ -67,7 +73,6 @@
       </div>
     </section>
 
-    <!-- 右：レシピ + AI + 買い物 -->
     <section class="card">
       <h2>レシピ提案 & 音声ガイド</h2>
       <div class="section">

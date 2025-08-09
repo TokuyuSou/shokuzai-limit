@@ -3,22 +3,26 @@ import { loadInv } from './storage.js';
 import { daysLeft, $ } from './utils.js';
 import { renderRecipeCard } from './ui.js';
 import { genRecipeRule } from './recipe_rule.js';
+import { CreateMLCEngine } from "https://esm.run/@mlc-ai/web-llm";
 
 let mlcEngine = null;
 let mlcReady = false;
 
-const DEFAULT_MLC_MODEL = "TinyLlama-1.1B-Chat-v1.0-q4f16_1";
+const DEFAULT_MLC_MODEL = "Phi-3.5-mini-instruct-q4f16_1-MLC";
 const aiStatus = (t)=>{ const el=document.getElementById('aiStatus'); if(el) el.textContent=t||''; };
 
 async function initMLC(){
   if(mlcEngine || mlcReady) return;
-  if(!('gpu' in navigator)){
+  if (!navigator.gpu) {
     aiStatus('WebGPU非対応（AI不可）');
     return;
   }
   try{
-    aiStatus('モデル読み込み中…（初回は数十秒）');
-    mlcEngine = await webllm.CreateMLCEngine({ model: DEFAULT_MLC_MODEL });
+    aiStatus('モデル読み込み中…（初回は数十秒〜数分）');
+    const initProgressCallback = (p)=>{
+      aiStatus(`モデル読み込み中… ${Math.round(p)}%`);
+    };
+    mlcEngine = await CreateMLCEngine(DEFAULT_MLC_MODEL, { initProgressCallback });
     mlcReady = true;
     aiStatus('AI準備完了');
   }catch(err){

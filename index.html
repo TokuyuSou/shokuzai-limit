@@ -3,59 +3,21 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>食材リミット | MVP</title>
-  <style>
-    :root{
-      --bg:#f8fafc;--card:#ffffff;--ink:#0f172a;--muted:#64748b;--accent:#16a34a;--warn:#e11d48;
-      --ring:#93c5fd;--chip:#e2e8f0
-    }
-    *{box-sizing:border-box}
-    body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,"Apple Color Emoji","Segoe UI Emoji"}
-    header{position:sticky;top:0;background:linear-gradient(180deg,rgba(248,250,252,.9),rgba(248,250,252,.6));backdrop-filter:saturate(180%) blur(8px);z-index:5;border-bottom:1px solid #e5e7eb}
-    .wrap{max-width:1100px;margin:0 auto;padding:16px}
-    h1{font-size:22px;margin:0;display:flex;gap:12px;align-items:center}
-    .badge{font-size:12px;background:var(--chip);padding:2px 8px;border-radius:999px;color:var(--muted)}
-    main{display:grid;grid-template-columns:1.1fr .9fr;gap:16px;padding:16px}
-    @media (max-width:960px){main{grid-template-columns:1fr}}
-    .card{background:var(--card);border:1px solid #e5e7eb;border-radius:14px;box-shadow:0 2px 10px rgba(0,0,0,.04)}
-    .card h2{margin:0;padding:14px 16px;border-bottom:1px solid #e5e7eb;font-size:18px}
-    .section{padding:14px 16px}
-    input,select,button,textarea{font:inherit}
-    .field{display:grid;grid-template-columns:120px 1fr;gap:8px;align-items:center;margin-bottom:10px}
-    .field input,.field select{width:100%;padding:10px;border:1px solid #cbd5e1;border-radius:10px}
-    .btn{display:inline-flex;align-items:center;gap:8px;background:#111827;color:#fff;padding:10px 14px;border:none;border-radius:10px;cursor:pointer}
-    .btn.secondary{background:#e5e7eb;color:#111827}
-    .btn.ghost{background:transparent;border:1px solid #cbd5e1;color:#111827}
-    .btn.warn{background:var(--warn)}
-    .stack{display:flex;gap:10px;flex-wrap:wrap}
-    .inv-list{width:100%;border-collapse:separate;border-spacing:0 8px}
-    .inv-list th{font-size:12px;color:var(--muted);font-weight:600;text-align:left;padding:0 8px}
-    .row{display:grid;grid-template-columns:28px 1.3fr .6fr .8fr .7fr .6fr 100px;gap:8px;align-items:center;padding:8px;border:1px solid #e5e7eb;border-radius:12px}
-    .row[data-soon="true"]{border-color:#fca5a5;background:#fff7f7}
-    .chip{font-size:12px;background:var(--chip);padding:4px 8px;border-radius:999px}
-    .muted{color:var(--muted)}
-    .right{margin-left:auto}
-    .camera{display:grid;gap:8px}
-    video,canvas{width:100%;border-radius:12px;border:1px dashed #cbd5e1;background:#f1f5f9}
-    .steps{display:flex;flex-direction:column;gap:12px}
-    .step{padding:10px 12px;border:1px solid #e5e7eb;border-radius:12px;background:#fff}
-    .tts-controls{display:flex;gap:8px}
-    .pill{padding:4px 8px;background:#ecfeff;border:1px solid #bae6fd;border-radius:999px;color:#0369a1;font-size:12px}
-    .table-head{display:grid;grid-template-columns:28px 1.3fr .6fr .8fr .7fr .6fr 100px;gap:8px;padding:0 8px;margin-bottom:6px}
-    .footer{padding:16px;color:var(--muted);text-align:center}
-    .kbd{font-variant-ligatures: none; font-feature-settings: "liga" 0; border:1px solid #cbd5e1;padding:2px 6px;border-bottom-width:3px;border-radius:6px;background:#f8fafc}
-    .danger{color:#b91c1c}
-    .success{color:#065f46}
-  </style>
+  <title>食材リミット</title>
+  <link rel="stylesheet" href="./assets/styles.css" />
+  <!-- OCR & LLM (global) -->
+  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@4/dist/tesseract.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/web-llm@latest/dist/web-llm.min.js"></script>
 </head>
 <body>
-  <header>
+  <header class="header">
     <div class="wrap">
-      <h1>🍳 食材リミット <span class="badge">MVP</span></h1>
+      <h1>🍳 食材リミット <span class="badge">MVP+</span></h1>
     </div>
   </header>
-  <main class="wrap">
-    <!-- 左カラム：在庫管理 + スキャン -->
+
+  <main class="wrap grid">
+    <!-- 左：在庫 + スキャン -->
     <section class="card">
       <h2>在庫 & 追加</h2>
       <div class="section">
@@ -76,8 +38,9 @@
           </div>
         </form>
       </div>
+
       <div class="section">
-        <h3 style="margin:0 0 8px">カメラスキャン（期限OCR）</h3>
+        <h3 class="h3">カメラスキャン（期限OCR）</h3>
         <div class="camera">
           <video id="video" playsinline muted></video>
           <div class="stack">
@@ -89,8 +52,9 @@
           <div id="ocrOut" class="muted"></div>
         </div>
       </div>
+
       <div class="section">
-        <h3 style="margin:0 0 6px">在庫一覧 <span id="invCount" class="muted"></span></h3>
+        <h3 class="h3">在庫一覧 <span id="invCount" class="muted"></span></h3>
         <div class="table-head muted">
           <div>#</div><div>食材</div><div>数量</div><div>期限</div><div>残り日数</div><div>カテゴリ</div><div></div>
         </div>
@@ -104,20 +68,22 @@
       </div>
     </section>
 
-    <!-- 右カラム：レシピ生成 + 音声 + 買い物リスト -->
+    <!-- 右：レシピ + AI + 買い物 -->
     <section class="card">
       <h2>レシピ提案 & 音声ガイド</h2>
       <div class="section">
         <div class="stack" style="align-items:center">
           <label class="muted">優先: <span class="kbd">期限が近い</span> / 制限: <span class="kbd">~30分</span> / 難易度: <span class="kbd">かんたん</span></label>
           <button class="btn" id="gen">レシピを生成</button>
+          <button class="btn secondary" id="genAI" title="オンデバイスLLMで生成（無料）">AIレシピ（無料）</button>
+          <span id="aiStatus" class="muted"></span>
         </div>
       </div>
       <div class="section" id="recipeArea">
         <div class="muted">まだレシピがありません。左の在庫を追加して「レシピを生成」を押してください。</div>
       </div>
       <div class="section">
-        <h3 style="margin:0 0 8px">買い物リスト</h3>
+        <h3 class="h3">買い物リスト</h3>
         <ul id="shopping"></ul>
         <div class="stack">
           <button class="btn ghost" id="copyShop">コピー</button>
@@ -132,286 +98,10 @@
       </div>
     </section>
   </main>
-  <div class="footer">MVP: ローカル保存のみ。音声はブラウザのWeb Speech APIを使用します。</div>
 
-  <!-- Tesseract.js CDN for OCR (run in browser) -->
-  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@4/dist/tesseract.min.js"></script>
-  <script>
-  // ======= Storage & Utilities =======
-  const storeKey = 'shokuzai.inv.v1';
-  const $ = (q)=>document.querySelector(q);
-  const $$=(q)=>Array.from(document.querySelectorAll(q));
-  const fmtDate = (d)=> d? new Date(d).toLocaleDateString('ja-JP',{year:'numeric',month:'2-digit',day:'2-digit'}):'';
-  const daysLeft = (d)=> {
-    if(!d) return null; const target = new Date(d); target.setHours(23,59,59,999);
-    const diff = target - new Date();
-    return Math.ceil(diff/86400000);
-  }
-  function loadInv(){ try{return JSON.parse(localStorage.getItem(storeKey)||'[]')}catch(e){return []} }
-  function saveInv(arr){ localStorage.setItem(storeKey, JSON.stringify(arr)); }
+  <div class="footer">MVP+: ローカル保存 / OCR / 無料AI（WebGPU）。音声はWeb Speech APIを使用。</div>
 
-  // ======= Inventory UI =======
-  function renderInv(){
-    const inv = loadInv().sort((a,b)=>{
-      const ad = a.expiry?new Date(a.expiry):new Date('2999-12-31');
-      const bd = b.expiry?new Date(b.expiry):new Date('2999-12-31');
-      return ad-bd;
-    });
-    $('#invCount').textContent = inv.length + ' 件';
-    const wrap = $('#inventory'); wrap.innerHTML='';
-    inv.forEach((it, i)=>{
-      const left = daysLeft(it.expiry);
-      const soon = left!==null && left<=3;
-      const row = document.createElement('div'); row.className='row'; row.dataset.soon = soon;
-      row.innerHTML = `
-        <div>${i+1}</div>
-        <div>${it.name}</div>
-        <div>${it.qty} ${it.unit||''}</div>
-        <div>${it.expiry?fmtDate(it.expiry):'<span class="muted">—</span>'}</div>
-        <div>${left===null?'<span class="muted">—</span>':left<0?'<span class="danger">期限切れ</span>':left+'日'}</div>
-        <div><span class="chip">${it.category||'その他'}</span></div>
-        <div class="stack">
-          <button class="btn ghost" data-act="use" data-id="${it.id}">消費</button>
-          <button class="btn ghost" data-act="del" data-id="${it.id}">削除</button>
-        </div>`;
-      wrap.appendChild(row);
-    });
-  }
-
-  function addInv(item){
-    const inv = loadInv(); inv.push(item); saveInv(inv); renderInv();
-  }
-  function delInv(id){ const inv=loadInv().filter(x=>x.id!==id); saveInv(inv); renderInv(); }
-  function useInv(id, amount=1){
-    const inv = loadInv(); const idx = inv.findIndex(x=>x.id===id);
-    if(idx>-1){ inv[idx].qty = Math.max(0, (parseFloat(inv[idx].qty)||0) - amount);
-      if(inv[idx].qty===0) inv.splice(idx,1); saveInv(inv); renderInv(); }
-  }
-
-  // ======= Form Handlers =======
-  $('#addForm').addEventListener('submit', (e)=>{
-    e.preventDefault();
-    const item = {
-      id: crypto.randomUUID(),
-      name: $('#name').value.trim(),
-      qty: parseFloat($('#qty').value)||1,
-      unit: $('#unit').value,
-      expiry: $('#expiry').value || null,
-      category: $('#category').value
-    };
-    if(!item.name){ alert('食材名を入力してください'); return; }
-    addInv(item); e.target.reset();
-  });
-  $('#clearForm').onclick=()=>$('#addForm').reset();
-  $('#quickExp').onclick=()=>{
-    const d = new Date(); d.setDate(d.getDate()+3);
-    $('#expiry').value = d.toISOString().slice(0,10);
-  }
-
-  // Delegate buttons in inventory
-  $('#inventory').addEventListener('click', (e)=>{
-    const btn = e.target.closest('button'); if(!btn) return;
-    const id = btn.dataset.id; const act = btn.dataset.act;
-    if(act==='del'){ if(confirm('削除しますか？')) delInv(id); }
-    if(act==='use'){ useInv(id, 1); }
-  });
-
-  // Export/Import/Wipe
-  $('#exportJson').onclick=()=>{
-    const blob = new Blob([JSON.stringify(loadInv(),null,2)],{type:'application/json'});
-    const a = document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='inventory.json'; a.click();
-  }
-  $('#importBtn').onclick=()=>$('#importJson').click();
-  $('#importJson').addEventListener('change', async (e)=>{
-    const file = e.target.files[0]; if(!file) return; const text = await file.text();
-    try { const data = JSON.parse(text); if(Array.isArray(data)){ saveInv(data); renderInv(); }
-      else alert('不正なJSONです'); }
-    catch(err){ alert('読み込みに失敗しました'); }
-  });
-  $('#wipe').onclick=()=>{ if(confirm('在庫を全削除しますか？')){ localStorage.removeItem(storeKey); renderInv(); } }
-
-  // ======= Camera + OCR (Tesseract.js) =======
-  let stream;
-  async function startCamera(){
-    if(stream) return; // already
-    try{
-      stream = await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'}});
-      const v = $('#video'); v.srcObject = stream; await v.play();
-    }catch(err){ alert('カメラを開始できません: '+err.message); }
-  }
-  $('#startCam').onclick = startCamera;
-
-  // Simple date pattern extractor
-  function extractDate(text){
-    // Normalize
-    const t = text.replace(/[\s\n]+/g,' ').replace(/[年\.]/g,'/').replace(/-/g,'/');
-    // Find yyyy/mm/dd or yy/mm/dd
-    const m = t.match(/(20\d{2}|19\d{2}|\d{2})\/(0?[1-9]|1[0-2])\/(0?[1-9]|[12]\d|3[01])/);
-    if(!m) return null;
-    let [_, y, mo, da] = m;
-    if(y.length===2){ y = (parseInt(y,10) > 50 ? '19'+y : '20'+y); }
-    const mm = String(mo).padStart(2,'0');
-    const dd = String(da).padStart(2,'0');
-    return `${y}-${mm}-${dd}`;
-  }
-
-  $('#snap').onclick = async ()=>{
-    try{
-      if(!stream) await startCamera();
-      const v=$('#video'); const c=$('#canvas'); c.hidden=false; c.width=v.videoWidth; c.height=v.videoHeight;
-      const ctx=c.getContext('2d'); ctx.drawImage(v,0,0,c.width,c.height);
-      $('#ocrOut').textContent='OCR処理中…';
-      const { data } = await Tesseract.recognize(c.toDataURL('image/png'), 'jpn+eng');
-      const raw = data.text || '';
-      const iso = extractDate(raw);
-      if(iso){ $('#expiry').value = iso; $('#ocrOut').innerHTML = `検出: <b>${fmtDate(iso)}</b>`; }
-      else { $('#ocrOut').innerHTML = `日付を検出できませんでした。<span class="muted">テキスト: ${raw.slice(0,80)}…</span>`; }
-    }catch(err){
-      console.error(err); alert('OCRに失敗: '+err.message);
-    }
-  }
-
-  // ======= Recipe Generator (rule-based MVP) =======
-  // Small recipe bank with required & optional ingredients
-  const RECIPES = [
-    { id:'yasai-soup', name:'やさしい野菜スープ', time:20, level:'かんたん',
-      need:['玉ねぎ','にんじん','じゃがいも','水'], opt:['コンソメ','ベーコン'],
-      steps:[
-        '野菜を一口大に切ります。',
-        '鍋に油を熱し、玉ねぎ→にんじん→じゃがいもの順に炒めます。',
-        '水とコンソメを入れ、中火で10〜12分煮ます。',
-        '塩こしょうで味を整え、器によそいます。'
-      ]
-    },
-    { id:'tamago-yakiudon', name:'たまご焼うどん', time:12, level:'かんたん',
-      need:['うどん','たまご','ねぎ'], opt:['めんつゆ','醤油'],
-      steps:[
-        'うどんを表示時間どおりに下茹でします。',
-        'フライパンに油をひき、溶き卵を炒め、うどんとねぎを加えます。',
-        'めんつゆ（または醤油）で味を整えて完成。'
-      ]
-    },
-    { id:'curry', name:'かんたんカレー', time:30, level:'ふつう',
-      need:['カレールー','玉ねぎ','にんじん','じゃがいも','水'], opt:['肉・魚'],
-      steps:[
-        '野菜と肉を切って炒めます。',
-        '水を加えて柔らかくなるまで煮ます。',
-        '火を止めてルーを溶かし、再度とろみが出るまで加熱します。'
-      ]
-    },
-    { id:'yakisoba', name:'野菜たっぷり焼きそば', time:15, level:'かんたん',
-      need:['焼きそば麺','キャベツ','にんじん'], opt:['豚肉','ソース'],
-      steps:[
-        'フライパンで麺を軽くほぐします。',
-        '野菜と（あれば）豚肉を加えて炒めます。',
-        'ソースで味付けして完成。'
-      ]
-    }
-  ];
-
-  function genRecipe(){
-    const inv = loadInv();
-    if(inv.length===0){ $('#recipeArea').innerHTML='<div class="muted">在庫がありません。</div>'; return; }
-    // pick top N near-expiry items
-    const sorted = inv.slice().sort((a,b)=>{
-      const ad=a.expiry?new Date(a.expiry):new Date('2999-12-31');
-      const bd=b.expiry?new Date(b.expiry):new Date('2999-12-31');
-      return ad-bd;
-    });
-    const focus = sorted.filter(x=>x.expiry).slice(0,4).map(x=>x.name);
-
-    // score recipes by overlap with available items
-    const names = inv.map(x=>x.name);
-    let best = null; let bestScore=-1; let missing=[];
-    for(const r of RECIPES){
-      const haveNeed = r.need.filter(n=> names.some(m=> m.includes(n)) );
-      const score = haveNeed.length - r.need.length*0.1 + r.opt.filter(o=> names.some(m=>m.includes(o)) ).length*0.05;
-      if(score>bestScore){ best=r; bestScore=score; }
-    }
-    // compute missing for best
-    missing = best.need.filter(n=> !names.some(m=>m.includes(n)) );
-
-    const eta = `⏱️ 約${best.time}分`; const lvl = `🎯 ${best.level}`;
-    const near = focus.length? `優先食材: ${focus.map(x=>`<span class="pill">${x}</span>`).join(' ')}`: '';
-
-    $('#recipeArea').innerHTML = `
-      <div class="stack" style="justify-content:space-between;align-items:center;margin-bottom:8px">
-        <h3 style="margin:0">${best.name}</h3>
-        <div class="muted">${eta} ・ ${lvl}</div>
-      </div>
-      <div class="muted" style="margin-bottom:8px">${near}</div>
-      <div><b>必要な食材:</b> ${best.need.join('、')}</div>
-      <div class="muted" style="margin:6px 0"><b>あると良い:</b> ${best.opt.join('、')}</div>
-      <div class="steps" id="steps">
-        ${best.steps.map((s,i)=>`<div class="step" data-idx="${i}"><b>手順 ${i+1}.</b> ${s}</div>`).join('')}
-      </div>
-      <div class="tts-controls" style="margin-top:8px">
-        <button class="btn" id="ttsPlay">▶️ 読み上げ</button>
-        <button class="btn secondary" id="ttsPause">⏸️ 一時停止</button>
-        <button class="btn secondary" id="ttsResume">⏯️ 再開</button>
-        <button class="btn ghost" id="finishCook">🍽️ 作った！</button>
-      </div>
-    `;
-
-    // TTS handlers
-    const utterances = best.steps.map((text,i)=>{
-      const u = new SpeechSynthesisUtterance(`手順 ${i+1}。${text}`);
-      u.lang='ja-JP';
-      u.rate=1.0; u.pitch=1.0; return u;
-    });
-
-    $('#ttsPlay').onclick = ()=>{
-      speechSynthesis.cancel(); // reset
-      utterances.forEach((u, i)=>{
-        u.onstart=()=> highlightStep(i,true);
-        u.onend=()=> highlightStep(i,false);
-        speechSynthesis.speak(u);
-      })
-    }
-    $('#ttsPause').onclick = ()=> speechSynthesis.pause();
-    $('#ttsResume').onclick = ()=> speechSynthesis.resume();
-
-    // Finish cooking: decrement used ingredients by 1 (rough MVP)
-    $('#finishCook').onclick = ()=>{
-      const namesToUse = best.need; // simplify
-      const invNow = loadInv();
-      namesToUse.forEach(n=>{
-        const hit = invNow.find(x=> x.name.includes(n));
-        if(hit){ hit.qty = Math.max(0,(parseFloat(hit.qty)||0)-1); }
-      });
-      const remaining = invNow.filter(x=> (parseFloat(x.qty)||0)>0);
-      saveInv(remaining); renderInv();
-      // Build shopping list for missing
-      const missingNow = best.need.filter(n=> !remaining.some(m=> m.name.includes(n)) );
-      setShopping(missing.concat(missingNow));
-      alert('在庫を更新し、買い物リストを作成しました。');
-    }
-  }
-
-  function highlightStep(i, on){
-    const el = document.querySelector(`#steps .step[data-idx="${i}"]`); if(!el) return;
-    el.style.borderColor = on? '#93c5fd':'#e5e7eb';
-    el.style.boxShadow = on? '0 0 0 3px rgba(147,197,253,.3)':'none';
-  }
-
-  document.querySelector('#gen').onclick = genRecipe;
-
-  // ======= Shopping List =======
-  function setShopping(items){
-    const list = document.querySelector('#shopping'); list.innerHTML='';
-    const uniq = Array.from(new Set(items));
-    uniq.forEach(x=>{ const li=document.createElement('li'); li.textContent=x; list.appendChild(li); });
-  }
-  document.querySelector('#copyShop').onclick=()=>{
-    const text = Array.from(document.querySelectorAll('#shopping li')).map(li=>`- ${li.textContent}`).join('\n');
-    navigator.clipboard.writeText(text||'').then(()=>{
-      alert('買い物リストをコピーしました');
-    });
-  }
-  document.querySelector('#clearShop').onclick=()=>{ document.querySelector('#shopping').innerHTML=''; }
-
-  // ======= Init =======
-  renderInv();
-  </script>
+  <!-- アプリ本体（ES Modules） -->
+  <script type="module" src="./js/main.js"></script>
 </body>
 </html>
